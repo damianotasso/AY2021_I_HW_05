@@ -12,8 +12,8 @@
 #ifndef __SERVICE_ROUTINES_H__
     #define __SERVICE_ROUTINES_H__
     
-    #include "cytypes.h"
     #include "global.h"
+    #include "I2C_protocol.h"
     
     CY_ISR_PROTO(custom_isr_BUTTON);
     

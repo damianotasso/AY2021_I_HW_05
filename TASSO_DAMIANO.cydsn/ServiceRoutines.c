@@ -13,21 +13,34 @@
 
 CY_ISR(custom_isr_BUTTON)
 {
+    EEPROM_UpdateTemperature();
     counter_button ++ ;
     
     switch(counter_button)
     {
         case 0:
+            EEPROM_WriteByte(LIS3DH_CTRL_REG1_1_HZ, 0x00);
+            error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, LIS3DH_CTRL_REG1_1_HZ);
             break;
         case 1:
+            EEPROM_WriteByte(LIS3DH_CTRL_REG1_10_HZ, 0x01);
+            error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, LIS3DH_CTRL_REG1_10_HZ);
             break;
         case 2:
+            EEPROM_WriteByte(LIS3DH_CTRL_REG1_25_HZ, 0x02);
+            error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, LIS3DH_CTRL_REG1_25_HZ);
             break;
         case 3:
+            EEPROM_WriteByte(LIS3DH_CTRL_REG1_50_HZ, 0x03);
+            error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, LIS3DH_CTRL_REG1_50_HZ);
             break;
         case 4:
+            EEPROM_WriteByte(LIS3DH_CTRL_REG1_100_HZ, 0x04);
+            error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, LIS3DH_CTRL_REG1_100_HZ);
             break;
         case 5:
+            EEPROM_WriteByte(LIS3DH_CTRL_REG1_200_HZ, 0x05);
+            error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, LIS3DH_CTRL_REG1_200_HZ);
             counter_button = 0;
             break;
     }

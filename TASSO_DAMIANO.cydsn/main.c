@@ -10,6 +10,7 @@
  * ========================================
 */
 #include "I2C_protocol.h"
+#include "ServiceRoutines.h"
 
 int main(void)
 {
@@ -17,6 +18,8 @@ int main(void)
 
     I2C_Peripheral_Start();
     UART_Start();
+    EEPROM_Start();
+    isr_BUTTON_StartEx(custom_isr_BUTTON);
     
     DataFrame[0] = HEADER;
     DataFrame[DATA_FRAME_SIZE - 1] = TAIL;
@@ -172,7 +175,7 @@ int main(void)
         
         if(error_R4 == NO_ERROR)
         {
-            //if(status_reg == NEW_DATA_AVALIABLE)
+            if(status_reg == NEW_DATA_AVALIABLE)
             {
                 error = I2C_Peripheral_ReadRegisterMulti(LIS3DH_DEVICE_ADDRESS,LIS3DH_OUT_X_L, N_ADC_REGISTERS, AccelerometerData);
                 
@@ -181,6 +184,54 @@ int main(void)
                     OutAcc1 = (int16)((AccelerometerData[0] | (AccelerometerData[1] << 8))) >> 4;
                     OutAcc2 = (int16)((AccelerometerData[2] | (AccelerometerData[3] << 8))) >> 4;
                     OutAcc3 = (int16)((AccelerometerData[4] | (AccelerometerData[5] << 8))) >> 4;
+                    
+                    /*
+                    MANDARE UN FLOAT --> provare dopo con il metodo internet
+                    
+                    
+                    
+                    OutAcc1_conv = (float)(OutAcc1 * m_s2_CONVERTER);
+                    //OutAcc1 = (int16)(OutAcc1_conv * CONVERTER);
+                    
+                    OutAcc2_conv = (float)(OutAcc2 * m_s2_CONVERTER);
+                    //OutAcc2 = (int16)(OutAcc2_conv * CONVERTER);
+                    
+                    OutAcc3_conv = (float)(OutAcc3 * m_s2_CONVERTER);
+                    //OutAcc3 = (int16)(OutAcc3_conv * CONVERTER);
+                   
+                    
+                    union{
+                        float Out1_conv;
+                        int32 X;
+                    }value1;
+                    union{
+                        float Out2_conv;      
+                        int32 X;
+                    }value2;
+                    
+                    union{
+                        float Out3_conv;      
+                        int32 X;
+                    }value3;
+                    
+                    value1.Out1_conv = OutAcc1_conv;
+                    value2.Out2_conv = OutAcc2_conv;
+                    value3.Out3_conv = OutAcc3_conv;
+                    
+                    OutAcc1 = (int16)(value1.X);
+                    OutAcc2 = (int16)(value2.X);
+                    OutAcc3 = (int16)(value3.X);
+                    */
+                    
+                    OutAcc1_conv = (float)(OutAcc1 * m_s2_CONVERTER);
+                    OutAcc1 = (int16)(OutAcc1_conv * CONVERTER);
+                    
+                    OutAcc2_conv = (float)(OutAcc2 * m_s2_CONVERTER);
+                    OutAcc2 = (int16)(OutAcc2_conv * CONVERTER);
+                    
+                    OutAcc3_conv = (float)(OutAcc3 * m_s2_CONVERTER);
+                    OutAcc3 = (int16)(OutAcc3_conv * CONVERTER);
+                    
                     
                     DataFrame[1] = (uint8_t)(OutAcc1 & 0xFF);
                     DataFrame[2] = (uint8_t)(OutAcc1 >> 8);
