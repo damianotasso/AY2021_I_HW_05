@@ -18,6 +18,9 @@ int main(void)
     I2C_Peripheral_Start();
     UART_Start();
     
+    DataFrame[0] = HEADER;
+    DataFrame[DATA_FRAME_SIZE - 1] = TAIL;
+    
      CyDelay(5); //"The boot procedure is complete about 5 milliseconds after device power-up."
     
     // String to print out messages on the UART
@@ -130,13 +133,18 @@ int main(void)
         }
     }
     
+    UART_PutString("\n\n");
+    
     /******************************************/
     /*            I2C Reading                 */
     /******************************************/
     
+    UART_PutString("\r\nReading new Registers' values..\r\n");
+    
     error_R1 = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, &ctrl_reg1);
     error_R2 = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG4, &ctrl_reg4);
     error_R3 = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_TEMP_CFG_REG, &tmp_cfg_reg);
+    error_R4 = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_STATUS_REG, &status_reg);
     
     if ((error_R1 == NO_ERROR) && (error_R2 == NO_ERROR) && (error_R3 == NO_ERROR))
     {
@@ -145,6 +153,8 @@ int main(void)
         sprintf(message, "CONTROL REGISTER 4 : 0x%02X\r\n", ctrl_reg4);
         UART_PutString(message);
         sprintf(message, "TEMPERATURE CONFIGURATION REGISTER : 0x%02X\r\n", tmp_cfg_reg);
+        UART_PutString(message);
+        sprintf(message, "STATUS REGISTER : 0x%02X\r\n", status_reg);
         UART_PutString(message);
     }
     else
@@ -156,7 +166,37 @@ int main(void)
 
     for(;;)
     {
+        CyDelay(100);
         
+        error_R4 = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_STATUS_REG, &status_reg);
+        
+        if(error_R4 == NO_ERROR)
+        {
+            //if(status_reg == NEW_DATA_AVALIABLE)
+            {
+                error = I2C_Peripheral_ReadRegisterMulti(LIS3DH_DEVICE_ADDRESS,LIS3DH_OUT_X_L, N_ADC_REGISTERS, AccelerometerData);
+                
+                if(error == NO_ERROR)
+                {
+                    OutAcc1 = (int16)((AccelerometerData[0] | (AccelerometerData[1] << 8))) >> 4;
+                    OutAcc2 = (int16)((AccelerometerData[2] | (AccelerometerData[3] << 8))) >> 4;
+                    OutAcc3 = (int16)((AccelerometerData[4] | (AccelerometerData[5] << 8))) >> 4;
+                    
+                    DataFrame[1] = (uint8_t)(OutAcc1 & 0xFF);
+                    DataFrame[2] = (uint8_t)(OutAcc1 >> 8);
+                    DataFrame[3] = (uint8_t)(OutAcc2 & 0xFF);
+                    DataFrame[4] = (uint8_t)(OutAcc2 >> 8);
+                    DataFrame[5] = (uint8_t)(OutAcc3 & 0xFF);
+                    DataFrame[6] = (uint8_t)(OutAcc3 >> 8);
+                    
+                    UART_PutArray(DataFrame, DATA_FRAME_SIZE);
+                }
+                else
+                {
+                    UART_PutString("Error occurred during I2C comm to read ADCs / temperature output registers\r\n");
+                }
+            }
+        }
     }
 }
 

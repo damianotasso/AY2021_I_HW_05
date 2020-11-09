@@ -28,13 +28,20 @@
     #define LIS3DH_CTRL_REG4_HR_MODE_BDU_ACTIVE 0x88 // --> 10001000 inizializza ad 1 la BDU (per ADC) in più inizializza ad 1 il bit HR per High Resolution
     #define LIS3DH_TEMP_CFG_REG 0x1F 
     #define LIS3DH_TEMP_CFG_REG_ADC_ACTIVE 0x80
-    #define LIS3DH_OUT_ADC1_L 0x08
-    #define LIS3DH_OUT_ADC1_H 0x09
-    #define LIS3DH_OUT_ADC2_L 0x0A
+    #define LIS3DH_OUT_X_L 0x28
+    #define LIS3DH_OUT_X_H 0x29
+    /*#define LIS3DH_OUT_ADC2_L 0x0A
     #define LIS3DH_OUT_ADC2_H 0x0B
     #define LIS3DH_OUT_ADC3_L 0x0C
-    #define LIS3DH_OUT_ADC3_H 0x0D
+    #define LIS3DH_OUT_ADC3_H 0x0D*/
     
+    #define NEW_DATA_AVALIABLE 0xFF
+    #define N_ADC_REGISTERS 6
+    #define BYTES_TO_SEND 6
+    #define DATA_FRAME_SIZE 1 + BYTES_TO_SEND + 1
+    #define HEADER 0xA0
+    #define TAIL 0xC0
+        
     
     typedef enum {
         NO_ERROR,           ///< No error generated
@@ -45,6 +52,7 @@
     uint8_t error_R1;
     uint8_t error_R2;
     uint8_t error_R3;
+    uint8_t error_R4;
     uint8_t counter;
     uint8_t counter_button;
     uint8_t button_flag;
@@ -52,6 +60,14 @@
     uint8_t ctrl_reg1;
     uint8_t ctrl_reg4;
     uint8_t tmp_cfg_reg;
+    uint8_t status_reg;
+    
+    uint8_t DataFrame[DATA_FRAME_SIZE];
+    uint8_t AccelerometerData[BYTES_TO_SEND];
+    int16 OutAcc1;
+    int16 OutAcc2;
+    int16 OutAcc3;
+    
     
     
 #endif
