@@ -83,7 +83,7 @@ int main(void)
     
     if (ctrl_reg1 != LIS3DH_START_MODE_CTRL_REG1)
     {
-        ctrl_reg1 = LIS3DH_START_MODE_CTRL_REG1;
+        ctrl_reg1 = EEPROM_ReadByte(0X00);
     
         error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, ctrl_reg1);
     
@@ -175,7 +175,7 @@ int main(void)
         
         if(error_R4 == NO_ERROR)
         {
-            if(status_reg == NEW_DATA_AVALIABLE)
+            if(status_reg & NEW_DATA_AVALIABLE)
             {
                 error = I2C_Peripheral_ReadRegisterMulti(LIS3DH_DEVICE_ADDRESS,LIS3DH_OUT_X_L, N_ADC_REGISTERS, AccelerometerData);
                 
@@ -185,60 +185,45 @@ int main(void)
                     OutAcc2 = (int16)((AccelerometerData[2] | (AccelerometerData[3] << 8))) >> 4;
                     OutAcc3 = (int16)((AccelerometerData[4] | (AccelerometerData[5] << 8))) >> 4;
                     
-                    /*
-                    MANDARE UN FLOAT --> provare dopo con il metodo internet
-                    
-                    
-                    
-                    OutAcc1_conv = (float)(OutAcc1 * m_s2_CONVERTER);
-                    //OutAcc1 = (int16)(OutAcc1_conv * CONVERTER);
-                    
-                    OutAcc2_conv = (float)(OutAcc2 * m_s2_CONVERTER);
-                    //OutAcc2 = (int16)(OutAcc2_conv * CONVERTER);
-                    
-                    OutAcc3_conv = (float)(OutAcc3 * m_s2_CONVERTER);
-                    //OutAcc3 = (int16)(OutAcc3_conv * CONVERTER);
-                   
-                    
                     union{
                         float Out1_conv;
-                        int32 X;
-                    }value1;
-                    union{
-                        float Out2_conv;      
-                        int32 X;
-                    }value2;
+                        uint32 X;
+                    }value_x;
                     
-                    union{
-                        float Out3_conv;      
-                        int32 X;
-                    }value3;
+                    value_x.Out1_conv = (float)(OutAcc1 * CONVERTION);
+                    final_x = value_x.X;
                     
-                    value1.Out1_conv = OutAcc1_conv;
-                    value2.Out2_conv = OutAcc2_conv;
-                    value3.Out3_conv = OutAcc3_conv;
+                    union
+                    {
+                        float Out2_conv;
+                        uint32 Y;
+                    }value_y;
                     
-                    OutAcc1 = (int16)(value1.X);
-                    OutAcc2 = (int16)(value2.X);
-                    OutAcc3 = (int16)(value3.X);
-                    */
+                    value_y.Out2_conv = (float)(OutAcc2 * CONVERTION);
+                    final_y = value_y.Y;
                     
-                    OutAcc1_conv = (float)(OutAcc1 * m_s2_CONVERTER);
-                    OutAcc1 = (int16)(OutAcc1_conv * CONVERTER);
+                    union
+                    {
+                        float Out3_conv;
+                        uint32 Z;
+                    }value_z;
                     
-                    OutAcc2_conv = (float)(OutAcc2 * m_s2_CONVERTER);
-                    OutAcc2 = (int16)(OutAcc2_conv * CONVERTER);
-                    
-                    OutAcc3_conv = (float)(OutAcc3 * m_s2_CONVERTER);
-                    OutAcc3 = (int16)(OutAcc3_conv * CONVERTER);
+                    value_z.Out3_conv = (float)(OutAcc3 * CONVERTION);
+                    final_z = value_z.Z;
                     
                     
-                    DataFrame[1] = (uint8_t)(OutAcc1 & 0xFF);
-                    DataFrame[2] = (uint8_t)(OutAcc1 >> 8);
-                    DataFrame[3] = (uint8_t)(OutAcc2 & 0xFF);
-                    DataFrame[4] = (uint8_t)(OutAcc2 >> 8);
-                    DataFrame[5] = (uint8_t)(OutAcc3 & 0xFF);
-                    DataFrame[6] = (uint8_t)(OutAcc3 >> 8);
+                    DataFrame[1]  = (final_x & 0xFF000000) >> 24;    //|
+                    DataFrame[2]  = (final_x & 0x00FF0000) >> 16;    //|
+                    DataFrame[3]  = (final_x & 0x0000FF00) >> 8;     //| ---------> pacchetto ADC1  
+                    DataFrame[4]  = (final_x & 0x000000FF);          //|
+                    DataFrame[5]  = (final_y & 0xFF000000) >> 24;    //|
+                    DataFrame[6]  = (final_y & 0x00FF0000) >> 16;    //|
+                    DataFrame[7]  = (final_y & 0x0000FF00) >> 8;     //| ---------> pacchetto ADC2  
+                    DataFrame[8]  = (final_y & 0x000000FF);          //|
+                    DataFrame[9]  = (final_z & 0xFF000000) >> 24;    //|
+                    DataFrame[10] = (final_z & 0x00FF0000) >> 16;    //|
+                    DataFrame[11] = (final_z & 0x0000FF00) >> 8;     //| ---------> pacchetto ADC3  
+                    DataFrame[12] = (final_z & 0x000000FF);          //|
                     
                     UART_PutArray(DataFrame, DATA_FRAME_SIZE);
                 }

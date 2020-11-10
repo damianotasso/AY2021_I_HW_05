@@ -25,5 +25,8 @@ uint8_t ctrl_reg1 = 0;
 uint8_t ctrl_reg4 = 0;
 uint8_t tmp_cfg_reg = 0;
 uint8_t status_reg = 0;
+int32 final_x = 0;
+int32 final_y = 0;
+int32 final_z = 0;
 
 /* [] END OF FILE */
