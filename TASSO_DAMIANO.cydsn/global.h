@@ -23,8 +23,7 @@
     #define LIS3DH_DEVICE_ADDRESS 0x18
     #define LIS3DH_STATUS_REG 0x27
     #define LIS3DH_CTRL_REG1 0x20
-    //#define LIS3DH_START_MODE_CTRL_REG1 0x17  // --> 00010111 inizializza ad 1 Hz inizialmente, in più mette a zero Lpen e ad 1 Z-Y-X axis
-    #define LIS3DH_START_MODE_CTRL_REG1 0x07    // 0000111 inizializza soltanto Z-Y-X axis
+    #define LIS3DH_START_MODE_CTRL_REG1 0x07    // 00000111 inizializza soltanto Z-Y-X axis
     #define LIS3DH_CTRL_REG1_1_HZ 0x17
     #define LIS3DH_CTRL_REG1_10_HZ 0x27
     #define LIS3DH_CTRL_REG1_25_HZ 0x37
@@ -32,7 +31,6 @@
     #define LIS3DH_CTRL_REG1_100_HZ 0x57
     #define LIS3DH_CTRL_REG1_200_HZ 0x67
     #define LIS3DH_CTRL_REG4 0x23
-    //#define LIS3DH_HR_MODE_CTRL_REG4 0x08     
     #define LIS3DH_CTRL_REG4_HR_MODE_BDU_ACTIVE 0x88 // --> 10001000 inizializza ad 1 la BDU (per ADC) in più inizializza ad 1 il bit HR per High Resolution in più FS --> 00
     #define LIS3DH_TEMP_CFG_REG 0x1F 
     #define LIS3DH_TEMP_CFG_REG_ADC_ACTIVE 0x80
@@ -75,13 +73,9 @@
     
     uint8_t DataFrame[DATA_FRAME_SIZE];
     uint8_t AccelerometerData[N_ADC_REGISTERS];
-    uint8_t AccelerometerDataConverted[N_ADC_REGISTERS];
     int16 OutAcc1;
     int16 OutAcc2;
     int16 OutAcc3;
-    float OutAcc1_conv;
-    float OutAcc2_conv;
-    float OutAcc3_conv;
     int32 final_x;
     int32 final_y;
     int32 final_z;

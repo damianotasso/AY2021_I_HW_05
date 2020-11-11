@@ -23,12 +23,8 @@ int main(void)
     
     DataFrame[0] = HEADER;
     DataFrame[DATA_FRAME_SIZE - 1] = TAIL;
-    
-    //EEPROM_WriteByte(ctrl_reg1_odr_update, 0x0000);
-    ctrl_reg1 = EEPROM_ReadByte(0x0000);
-    
-    
-     CyDelay(5); //"The boot procedure is complete about 5 milliseconds after device power-up."
+        
+    CyDelay(5); //"The boot procedure is complete about 5 milliseconds after device power-up."
     
     // String to print out messages on the UART
     char message[50] = {'\0'};
@@ -45,7 +41,7 @@ int main(void)
     /*            I2C Writing                 */
     /******************************************/
        
-    UART_PutString("\r\nWriting new Registers' values..\r\n");
+    UART_PutString("\r\nWriting Registers' values..\r\n");
     
     /***  CTRL_REG1 Writing in the start condition    ***/
     
@@ -114,7 +110,7 @@ int main(void)
     /*            I2C Reading                 */
     /******************************************/
     
-    UART_PutString("\r\nReading new Registers' values..\r\n");
+    UART_PutString("\r\nReading Registers' values..\r\n");
     
     error_R1 = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, &ctrl_reg1);
     error_R2 = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG4, &ctrl_reg4);
@@ -143,27 +139,36 @@ int main(void)
     {
         CyDelay(100);
         
-        ctrl_reg1 = EEPROM_ReadByte(0x0000);
-        error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, ctrl_reg1);
+        if(button_flag == HIGH)
+        {
+            button_flag = LOW;
+            incremento = EEPROM_ReadByte(0x0000) >> 4;
+    
+            incremento ++;
+            if(incremento > 6) incremento = 1;
+            
+            msb_incremento = (incremento) << 4; 
+            
+            ctrl_reg1_odr_update = LIS3DH_START_MODE_CTRL_REG1 | msb_incremento;
+            
+            EEPROM_WriteByte(ctrl_reg1_odr_update, 0x0000);
+            
+            //ctrl_reg1 = EEPROM_ReadByte(0x0000);
+            //error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, ctrl_reg1);
         
-        if (error == ERROR)
+            if (error == ERROR)
             {
                 UART_PutString("Error occurred during I2C comm to set control register 1\r\n"); 
             }
-
-        /*
-        if (ctrl_reg1 != ctrl_reg1_odr_update)
-        {
-            ctrl_reg1 = ctrl_reg1_odr_update;
-        
-            error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, ctrl_reg1);
-            
-            EEPROM_WriteByte(ctrl_reg1_odr_update, 0x0000);
-        
-            
         }
-        */
-        
+
+        ctrl_reg1 = EEPROM_ReadByte(0x0000);
+        error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, ctrl_reg1);
+        if (error == ERROR)
+        {
+            UART_PutString("Error occurred during I2C comm to set control register 1\r\n"); 
+        }
+            
         error_R4 = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_STATUS_REG, &status_reg);
         
         if(error_R4 == NO_ERROR)
@@ -209,10 +214,10 @@ int main(void)
                     DataFrame[2]  = (final_x & 0x00FF0000) >> 16;    //|
                     DataFrame[3]  = (final_x & 0x0000FF00) >> 8;     //| ---------> pacchetto ADC1  
                     DataFrame[4]  = (final_x & 0x000000FF);          //|
-                    DataFrame[5]  = (final_y & 0xFF000000) >> 24;    //|
-                    DataFrame[6]  = (final_y & 0x00FF0000) >> 16;    //|
-                    DataFrame[7]  = (final_y & 0x0000FF00) >> 8;     //| ---------> pacchetto ADC2  
-                    DataFrame[8]  = (final_y & 0x000000FF);          //|
+                    DataFrame[5]  = (final_y & 0xFF000000) >> 24;       //|
+                    DataFrame[6]  = (final_y & 0x00FF0000) >> 16;       //|
+                    DataFrame[7]  = (final_y & 0x0000FF00) >> 8;        //| ---------> pacchetto ADC2  
+                    DataFrame[8]  = (final_y & 0x000000FF);             //|
                     DataFrame[9]  = (final_z & 0xFF000000) >> 24;    //|
                     DataFrame[10] = (final_z & 0x00FF0000) >> 16;    //|
                     DataFrame[11] = (final_z & 0x0000FF00) >> 8;     //| ---------> pacchetto ADC3  
