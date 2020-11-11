@@ -24,6 +24,10 @@ int main(void)
     DataFrame[0] = HEADER;
     DataFrame[DATA_FRAME_SIZE - 1] = TAIL;
     
+    //EEPROM_WriteByte(ctrl_reg1_odr_update, 0x0000);
+    ctrl_reg1 = EEPROM_ReadByte(0x0000);
+    
+    
      CyDelay(5); //"The boot procedure is complete about 5 milliseconds after device power-up."
     
     // String to print out messages on the UART
@@ -36,42 +40,6 @@ int main(void)
     
     CyDelay(100);
     
-    uint32_t rval;
- 
-	// Setup the screen and print the header
-	UART_PutString("\n\n   ");
-	for(uint8_t i = 0; i<0x10; i++)
-	{
-        sprintf(message, "%02X ", i);
-		UART_PutString(message);
-	}
- 
-	// Iterate through the address starting at 0x00
-	for(uint8_t i2caddress = 0; i2caddress < 0x80; i2caddress++)
-	{
-		if(i2caddress % 0x10 == 0 )
-        {
-            sprintf(message, "\n%02X ", i2caddress);
-		    UART_PutString(message);
-        }
- 
-		rval = I2C_Master_MasterSendStart(i2caddress, I2C_Master_WRITE_XFER_MODE);
-        
-        if(rval == I2C_Master_MSTR_NO_ERROR) // If you get ACK then print the address
-		{
-            sprintf(message, "%02X ", i2caddress);
-		    UART_PutString(message);
-		}
-		else //  Otherwise print a --
-		{
-		    UART_PutString("-- ");
-		}
-        I2C_Master_MasterSendStop();
-	}
-	UART_PutString("\n\n");
-    
-    
-    
     
     /******************************************/
     /*            I2C Writing                 */
@@ -81,9 +49,13 @@ int main(void)
     
     /***  CTRL_REG1 Writing in the start condition    ***/
     
-    if (ctrl_reg1 != LIS3DH_START_MODE_CTRL_REG1)
+    //ctrl_reg1 = EEPROM_ReadByte(0x0000);
+    //error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, ctrl_reg1);
+    //sprintf(message, "CONTROL REGISTER 1 successfully written as: 0x%02X\r\n", ctrl_reg1);
+    
+    /*if (ctrl_reg1 != ctrl_reg1_odr_update)
     {
-        ctrl_reg1 = EEPROM_ReadByte(0X00);
+        ctrl_reg1 = ctrl_reg1_odr_update;
     
         error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, ctrl_reg1);
     
@@ -96,7 +68,7 @@ int main(void)
         {
             UART_PutString("Error occurred during I2C comm to set control register 1\r\n");   
         }
-    }
+    }*/
     
     /***  CTRL_REG4 Writing in the right condition    ***/
     
@@ -170,6 +142,27 @@ int main(void)
     for(;;)
     {
         CyDelay(100);
+        
+        ctrl_reg1 = EEPROM_ReadByte(0x0000);
+        error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, ctrl_reg1);
+        
+        if (error == ERROR)
+            {
+                UART_PutString("Error occurred during I2C comm to set control register 1\r\n"); 
+            }
+
+        /*
+        if (ctrl_reg1 != ctrl_reg1_odr_update)
+        {
+            ctrl_reg1 = ctrl_reg1_odr_update;
+        
+            error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_CTRL_REG1, ctrl_reg1);
+            
+            EEPROM_WriteByte(ctrl_reg1_odr_update, 0x0000);
+        
+            
+        }
+        */
         
         error_R4 = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS, LIS3DH_STATUS_REG, &status_reg);
         

@@ -23,7 +23,8 @@
     #define LIS3DH_DEVICE_ADDRESS 0x18
     #define LIS3DH_STATUS_REG 0x27
     #define LIS3DH_CTRL_REG1 0x20
-    #define LIS3DH_START_MODE_CTRL_REG1 0x17  // --> 00010111 inizializza ad 1 Hz inizialmente, in più mette a zero Lpen e ad 1 Z-Y-X axis
+    //#define LIS3DH_START_MODE_CTRL_REG1 0x17  // --> 00010111 inizializza ad 1 Hz inizialmente, in più mette a zero Lpen e ad 1 Z-Y-X axis
+    #define LIS3DH_START_MODE_CTRL_REG1 0x07    // 0000111 inizializza soltanto Z-Y-X axis
     #define LIS3DH_CTRL_REG1_1_HZ 0x17
     #define LIS3DH_CTRL_REG1_10_HZ 0x27
     #define LIS3DH_CTRL_REG1_25_HZ 0x37
@@ -62,10 +63,12 @@
     uint8_t error_R3;
     uint8_t error_R4;
     uint8_t counter;
-    uint8_t counter_button;
     uint8_t button_flag;
     char message[50];
+    uint8_t incremento;
+    uint8_t msb_incremento;
     uint8_t ctrl_reg1;
+    uint8_t ctrl_reg1_odr_update;
     uint8_t ctrl_reg4;
     uint8_t tmp_cfg_reg;
     uint8_t status_reg;
