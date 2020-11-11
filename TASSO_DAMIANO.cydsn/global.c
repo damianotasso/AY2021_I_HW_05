@@ -1,13 +1,9 @@
-/* ========================================
+/** ====================================================================================
+ * Damiano Tasso 944232
  *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
- * ========================================
+ * In this .c file there are the initializations of variables used in the entire project  
+ * 
+ * =====================================================================================
 */
 
 #include "global.h"
@@ -18,8 +14,8 @@ uint8_t error_R2 = 0;
 uint8_t error_R3 = 0;
 uint8_t error_R4 = 0;
 uint8_t counter = 0;
-uint8_t incremento = 0;
-uint8_t msb_incremento = 0;
+uint8_t increment = 0;
+uint8_t msb_increment = 0;
 uint8_t button_flag = LOW;
 char message[50] = {'\0'};
 uint8_t ctrl_reg1 = 0;
