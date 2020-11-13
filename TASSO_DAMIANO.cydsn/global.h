@@ -16,13 +16,7 @@
     #define LIS3DH_DEVICE_ADDRESS 0x18
     #define LIS3DH_STATUS_REG 0x27
     #define LIS3DH_CTRL_REG1 0x20
-    #define LIS3DH_START_MODE_CTRL_REG1 0x07            // 00000111 This mask initializes only Z-Y-X axis, the 3rd bit (LPen) is 0 in order to have the High-resolutin mode
-    #define LIS3DH_CTRL_REG1_1_HZ 0x17                                  
-    #define LIS3DH_CTRL_REG1_10_HZ 0x27                                 
-    #define LIS3DH_CTRL_REG1_25_HZ 0x37                                 
-    #define LIS3DH_CTRL_REG1_50_HZ 0x47                                 
-    #define LIS3DH_CTRL_REG1_100_HZ 0x57                                
-    #define LIS3DH_CTRL_REG1_200_HZ 0x67                                
+    #define LIS3DH_START_MODE_CTRL_REG1 0x07            // 00000111 This mask initializes only Z-Y-X axis, the 3rd bit (LPen) is 0 in order to have the High-resolutin mode                               
     #define LIS3DH_CTRL_REG4 0x23                                       
     #define LIS3DH_CTRL_REG4_HR_MODE_BDU_ACTIVE 0x88    // 10001000 This mask initializes the 3rd(HR --> for high-resolution mode) and 7th(BDU) bits to 1
     #define LIS3DH_TEMP_CFG_REG 0x1F 
@@ -54,11 +48,11 @@
     uint8_t error_R2;
     uint8_t error_R3;
     uint8_t error_R4;
-    uint8_t counter;
     uint8_t button_flag;
     char message[50];
     uint8_t increment;
     uint8_t msb_increment;
+    uint8_t counter;
     uint8_t ctrl_reg1;
     uint8_t ctrl_reg1_odr_update;
     uint8_t ctrl_reg4;
@@ -82,14 +76,14 @@
     
     union
     {
-    float Out2_conv;
-    uint32 Y;
+        float Out2_conv;
+        uint32 Y;
     }value_y;
     
     union
-                    {
-    float Out3_conv;
-    uint32 Z;
+    {
+        float Out3_conv;
+        uint32 Z;
     }value_z;
     
     

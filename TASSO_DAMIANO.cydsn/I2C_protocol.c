@@ -1,13 +1,9 @@
-/* ========================================
+/* ===================================================================
+ * Damiano Tasso 944232
  *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
- * ========================================
+ * In this .c file are implemented the function defined on the .h file.
+ * N.B. The same function seen during lessond are been used.
+ * ===================================================================
 */
 
 #include "I2C_protocol.h"
